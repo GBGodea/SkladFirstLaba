@@ -1,6 +1,3 @@
-package Entities;
+package Entities.HelperClasses;
 
-public class Passport {
-    int serial;
-    int number;
-}
+public record Passport(int serial, int number) { }

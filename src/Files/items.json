@@ -1,0 +1,8 @@
+{
+  "Electronics": ["Laptop", "Phone", "Charger", "Mouse", "Keyboard", "Flashlight"],
+  "Office Supplies": ["Pen", "Notebook", "Calendar", "Rubber Band"],
+  "Household Items": ["Cup", "Mug", "Glass", "Lamp", "Pillow", "Mat", "Chair"],
+  "Personal Accessories": ["Watch", "Glasses", "Bag", "Key", "Briefcase"],
+  "Tools": ["Knife", "Stick"],
+  "Others": ["Book", "Map", "Car", "Umbrella"]
+}
