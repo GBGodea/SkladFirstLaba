@@ -93,4 +93,16 @@ public class Employee extends Person {
             return new Employee(this);
         }
     }
+
+    public double getSalary() {
+        return salary;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public String getJobPosition() {
+        return jobPosition.toString();
+    }
 }

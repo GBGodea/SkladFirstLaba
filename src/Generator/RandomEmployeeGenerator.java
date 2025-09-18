@@ -20,9 +20,8 @@ public class RandomEmployeeGenerator implements Generator<Employee> {
         List<String> surnameList = FileReaderClass.readSurnameList();
         JobPosition[] jobPosition = JobPosition.values();
 
-        for(int i = 0; i < rand.nextInt(100_000); i++) {
+        for (int i = 0; i < (50_000); i++) {
             LocalDateTime[] times = TimeGenerator.between();
-
 
             employees.add(
                     new Employee.Builder()
