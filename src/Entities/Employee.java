@@ -103,6 +103,7 @@ public class Employee extends Person {
     }
 
     public String getJobPosition() {
+
         return jobPosition.toString();
     }
 }
