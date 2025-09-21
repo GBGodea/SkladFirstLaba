@@ -2,19 +2,10 @@ package Generator;
 
 import Entities.HelperClasses.ShippingMethod;
 import Entities.Items;
-import Generator.helper.FileReaderClass;
+import Generator.utils.FileReaderClass;
 import JsonReader.JsonReader;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.*;
-
-/*
-    TODO Найти файл с рандомным названиями вещей
- */
 
 public class RandomItemsGenerator implements Generator<Items> {
     @Override
@@ -27,7 +18,7 @@ public class RandomItemsGenerator implements Generator<Items> {
         List<String> readFile = FileReaderClass.readColors();
         ShippingMethod[] methods = ShippingMethod.values();
 
-        for(int i = 0; i < rand.nextInt(100_000); i++) {
+        for(int i = 0; i < rand.nextInt(100_000_000); i++) {
             String category = categories[rand.nextInt(categories.length)];
             List<String> takedItems = parsedJson.get(category);
             String item = takedItems.get(rand.nextInt(takedItems.size()));

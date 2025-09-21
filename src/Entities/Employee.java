@@ -7,19 +7,9 @@ import Entities.HelperClasses.Person;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-/*
-    В том числе реализует
-    UUID id;
-    String name;
-    int age;
-    Passport passport;
-    LocalDateTime entryDate;
-    LocalDateTime releaseDate;
- */
-
 public class Employee extends Person {
-    double salary;
-    JobPosition jobPosition;
+    protected double salary;
+    protected JobPosition jobPosition;
 
     public Employee(Builder builder) {
         this.id = builder.id;
@@ -92,5 +82,13 @@ public class Employee extends Person {
         public Employee build() {
             return new Employee(this);
         }
+    }
+
+    public JobPosition getJobPosition() {
+        return jobPosition;
+    }
+
+    public double getSalary() {
+        return salary;
     }
 }

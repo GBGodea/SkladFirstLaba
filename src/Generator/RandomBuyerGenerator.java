@@ -3,21 +3,14 @@ package Generator;
 import Entities.Buyer;
 import Entities.HelperClasses.Passport;
 import Entities.Items;
-import Generator.helper.FileReaderClass;
+import Generator.utils.FileReaderClass;
 
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
-/*
-    TODO
-    Сделать рандомный генератор покупателей
- */
 public class RandomBuyerGenerator implements Generator<Buyer> {
     @Override
     public List<Buyer> generator() {
@@ -28,7 +21,7 @@ public class RandomBuyerGenerator implements Generator<Buyer> {
         List<Items> items = new RandomItemsGenerator().generator();
 
         if(items.size() > 0) {
-            for (int i = 0; i < rand.nextInt(100_000); i++) {
+            for (int i = 0; i < rand.nextInt(100_000_000); i++) {
                 LocalDateTime[] times = TimeGenerator.between();
                 int firstRand = rand.nextInt(items.size());
                 int secondRand;

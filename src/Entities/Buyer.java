@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class Buyer extends Person {
-    List<Items> basket;
+    protected List<Items> basket;
 
     public Buyer(Builder builder) {
         this.id = builder.id;
@@ -74,5 +74,9 @@ public class Buyer extends Person {
         public Buyer build() {
             return new Buyer(this);
         }
+    }
+
+    public List<Items> getBasket() {
+        return basket;
     }
 }

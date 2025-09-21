@@ -4,21 +4,15 @@ import Entities.HelperClasses.ShippingMethod;
 
 import java.util.UUID;
 
-/*
-    TODO
-    Сделать entity предмета, который будет храниться на складе
-    id, количество, название, и т.д.
- */
-
 public class Items {
-    UUID id;
-    String name;
-    String category;
-    String color;
-    int[] size;
-    int count;
-    double price;
-    ShippingMethod shippingMethod;
+    protected UUID id;
+    protected String name;
+    protected String category;
+    protected String color;
+    protected int[] size;
+    protected int count;
+    protected double price;
+    protected ShippingMethod shippingMethod;
 
     public Items(Builder builder) {
         this.id = builder.id;
@@ -84,5 +78,17 @@ public class Items {
         public Items build() {
             return new Items(this);
         }
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getCount() {
+        return count;
     }
 }

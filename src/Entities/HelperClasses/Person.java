@@ -1,21 +1,38 @@
 package Entities.HelperClasses;
 
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 import java.util.UUID;
 
-/*
-    TODO
-    Сделать Базовый класс человека, от которого будут наследоваться пользователи склада
-     и работники склада
-     id, имя, возраст, паспортнгые данные, дата прихода и ухода и т.д.
- */
 public class Person {
-    public UUID id;
-    public String name;
-    public String surname;
-    public int age;
-    public Passport passport;
-    public LocalDateTime entryDate;
-    public LocalDateTime releaseDate;
+    protected UUID id;
+    protected String name;
+    protected String surname;
+    protected int age;
+    protected Passport passport;
+    protected LocalDateTime entryDate;
+    protected LocalDateTime releaseDate;
+
+    public String getName() {
+        return name;
+    }
+
+    public String getSurname() {
+        return surname;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public Passport getPassport() {
+        return passport;
+    }
+
+    public LocalDateTime getEntryDate() {
+        return entryDate;
+    }
+
+    public LocalDateTime getReleaseDate() {
+        return releaseDate;
+    }
 }
