@@ -14,8 +14,8 @@ public class StatsEmpoyee {
         Map<String, List<Double>> salaryByPosition = new HashMap<>();
 
         for (Employee employee : employees) {
-            String position = employee.getJobPosition().toString();
-            double salary = employee.getSalary();
+            String position = employee.jobPosition().toString();
+            double salary = employee.salary();
 
             salaryByPosition.computeIfAbsent(position, k -> new ArrayList<>()).add(salary);
         }
@@ -35,8 +35,8 @@ public class StatsEmpoyee {
     public static Map<String, Double> calculateStream(List<Employee> employees) {
         return employees.stream()
                 .collect(Collectors.groupingBy(
-                        employee -> employee.getJobPosition().toString(),
-                        Collectors.averagingDouble(Employee::getSalary)));
+                        employee -> employee.jobPosition().toString(),
+                        Collectors.averagingDouble(Employee::salary)));
     }
 
     public static Map<String, Double> calculateCollector(List<Employee> employees) {
@@ -44,9 +44,9 @@ public class StatsEmpoyee {
                 .collect(Collector.of(
                         HashMap::new,
                         (Map<String, SalaryStats> acc, Employee employee) -> {
-                            String position = employee.getJobPosition().toString();
+                            String position = employee.jobPosition().toString();
                             SalaryStats stats = acc.computeIfAbsent(position, k -> new SalaryStats());
-                            stats.addSalary(employee.getSalary());
+                            stats.addSalary(employee.salary());
                         },
                         (Map<String, SalaryStats> map1, Map<String, SalaryStats> map2) -> {
                             map2.forEach((position, stats) -> map1.merge(position, stats, SalaryStats::merge));
@@ -58,6 +58,8 @@ public class StatsEmpoyee {
                             return result;
                         }));
     }
+
+    public
 
     static class SalaryStats {
         private double sum = 0;

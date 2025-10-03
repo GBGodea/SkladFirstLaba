@@ -2,55 +2,58 @@ package Generator;
 
 import Entities.Buyer;
 import Entities.HelperClasses.Passport;
+import Entities.HelperClasses.Person;
 import Entities.Items;
 import Generator.utils.FileReaderClass;
+import JsonReader.JsonReader;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 
 public class RandomBuyerGenerator implements Generator<Buyer> {
     @Override
     public List<Buyer> generator() {
         Random rand = new Random();
         List<Buyer> buyerList = new ArrayList<>();
-        List<String> nameList = FileReaderClass.readNameList();
-        List<String> surnameList = FileReaderClass.readSurnameList();
+        Map<String, Map<String, List<String>>> namesMap = JsonReader.readNames();
         List<Items> items = new RandomItemsGenerator().generator();
 
-        if(items.size() > 0) {
-            for (int i = 0; i < rand.nextInt(100_000_000); i++) {
+        if (!items.isEmpty()) {
+            int count = rand.nextInt(100,100_000);
+            for (int i = 0; i < count; i++) {
+                String gender = rand.nextBoolean() ? "male" : "female";
+                Map<String, List<String>> genderMap = namesMap.get(gender);
+
+                List<String> firstNames = genderMap.get("firstNames");
+                List<String> lastNames = genderMap.get("lastNames");
+
+                String name = firstNames.get(rand.nextInt(firstNames.size()));
+                String surname = lastNames.get(rand.nextInt(lastNames.size()));
+
                 LocalDateTime[] times = TimeGenerator.between();
                 int firstRand = rand.nextInt(items.size());
-                int secondRand;
+                int secondRand = firstRand < items.size() - 1
+                        ? rand.nextInt(firstRand, items.size())
+                        : firstRand;
 
-                if (firstRand >= items.size() - 1) {
-                    secondRand = firstRand;
-                } else {
-                    int bound = rand.nextInt(firstRand + 1, items.size());
-                    secondRand = rand.nextInt(firstRand, bound);
-                }
+                Person person = new Person(
+                        UUID.randomUUID(),
+                        name,
+                        surname,
+                        rand.nextInt(14, 100),
+                        new Passport(rand.nextInt(1000, 9999),
+                                rand.nextInt(100_000, 999_999)),
+                        times[0],
+                        times[1]
+                );
 
-                assert nameList != null;
-                assert surnameList != null;
-                buyerList.add(new Buyer.Builder()
-                        .id(UUID.randomUUID())
-                        .name(nameList.get(rand.nextInt(nameList.size() - 1)))
-                        .surname(surnameList.get(rand.nextInt(surnameList.size() - 1)))
-                        .age(rand.nextInt(14, 100))
-                        .passport(new Passport(
-                                rand.nextInt(1000, 9999),
-                                rand.nextInt(100_000, 999_999))
-                        )
-                        .entryDate(times[0])
-                        .releaseDate(times[1])
-                        .basket(items.subList(firstRand, secondRand))
-                        .build());
+                Buyer buyer = new Buyer(
+                        person,
+                        items.subList(firstRand, secondRand)
+                );
+                buyerList.add(buyer);
             }
         }
-
         return buyerList;
     }
 }

@@ -33,7 +33,7 @@ public class Warehouse {
         RandomItemsGenerator randomItemsGenerator = new RandomItemsGenerator();
         List<Buyer> buyer = randomBuyerGenerator.generator();
         List<Employee> employees = randomEmployeeGenerator.generator();
-        List<Person> persons = Stream.concat(buyer.stream(), employees.stream())
+        List<Person> persons = Stream.concat(buyer.stream().map(Buyer::person), employees.stream().map(Employee::person))
                 .collect(Collectors.toCollection(ArrayList::new));
         List<Items> items = randomItemsGenerator.generator();
 
@@ -211,6 +211,18 @@ public class Warehouse {
         end = Instant.now();
         System.out.println("Время выполнения:" + Duration.between(start, end).toNanos());
         System.out.println(result3);
+
+        // Статистика поиска 3 покупателей с самой высокой покупательской способностью, по товарм
+        System.out.println("\n" + statistics.valueAnalysis());
+
+        // Топ людей по разнообразию корзины
+        System.out.println("\nBusket: " + statistics.topByCategoryDiversity());
+
+        // Топ людей по соотношению возраст-зарплата(чем моложе и выше зарплата, тем лучше)
+        System.out.println("\nTop age: " + statistics.topByAgeSalaryRatio());
+
+        // Расчёт дисперсии по товарам
+        System.out.println("\nDispersia: " + statistics.topByPriceVariance());
 
         /*
             Все запуски от 1 до 100_000 элементов
