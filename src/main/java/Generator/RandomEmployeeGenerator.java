@@ -11,13 +11,13 @@ import java.util.*;
 
 public class RandomEmployeeGenerator implements Generator<Employee> {
     @Override
-    public List<Employee> generator() {
+    public List<Employee> generator(int size) {
         Random rand = new Random();
         List<Employee> employees = new ArrayList<>();
         Map<String, Map<String, List<String>>> namesMap = JsonReader.readNames();
         JobPosition[] jobPositions = JobPosition.values();
 
-        int count = rand.nextInt(100, 100_000);
+        int count = rand.nextInt(size);
         for (int i = 0; i < count; i++) {
             String gender = rand.nextBoolean() ? "male" : "female";
             Map<String, List<String>> genderMap = namesMap.get(gender);

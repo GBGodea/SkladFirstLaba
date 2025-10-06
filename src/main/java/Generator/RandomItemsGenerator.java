@@ -4,7 +4,6 @@ import Entities.HelperClasses.Category;
 import Entities.HelperClasses.Colors;
 import Entities.HelperClasses.ShippingMethod;
 import Entities.Items;
-import Generator.utils.FileReaderClass;
 import JsonReader.JsonReader;
 
 import java.math.BigDecimal;
@@ -12,48 +11,47 @@ import java.util.*;
 
 public class RandomItemsGenerator implements Generator<Items> {
     @Override
-    public List<Items> generator() {
+    public List<Items> generator(int size) {
         Random rand = new Random();
         List<Items> itemsList = new ArrayList<>();
-        JsonReader jsonReader = new JsonReader();
-        Map<String, List<String>> parsedJson = jsonReader.readItems();
+        Map<String, List<String>> parsedJson = JsonReader.readItems();
         String[] categories = parsedJson.keySet().toArray(new String[0]);
         Colors[] colors = Colors.values();
         ShippingMethod[] methods = ShippingMethod.values();
 
-        for (int i = 0; i < rand.nextInt(100, 100_000); i++) {
+        for (int i = 0; i < rand.nextInt(size); i++) {
             Category category = Category.valueOf(categories[rand.nextInt(categories.length)].replaceAll(" ", ""));
             List<String> takedItems = parsedJson.get(category.toString());
             String item = takedItems.get(rand.nextInt(takedItems.size()));
             Colors color = colors[rand.nextInt(colors.length)];
-            int[] size = new int[3];
+            int[] itemSize = new int[3];
             BigDecimal price = new BigDecimal(0);
 
             switch (category) {
                 case Electronics -> {
-                    size[0] = rand.nextInt(1, 5);
-                    size[1] = rand.nextInt(1, 5);
-                    size[2] = rand.nextInt(1, 5);
+                    itemSize[0] = rand.nextInt(1, 5);
+                    itemSize[1] = rand.nextInt(1, 5);
+                    itemSize[2] = rand.nextInt(1, 5);
                 }
                 case OfficeSupplies -> {
-                    size[0] = rand.nextInt(1, 2);
-                    size[1] = rand.nextInt(1, 2);
-                    size[2] = rand.nextInt(1, 2);
+                    itemSize[0] = rand.nextInt(1, 2);
+                    itemSize[1] = rand.nextInt(1, 2);
+                    itemSize[2] = rand.nextInt(1, 2);
                 }
                 case HouseholdItems -> {
-                    size[0] = rand.nextInt(3, 8);
-                    size[1] = rand.nextInt(3, 8);
-                    size[2] = rand.nextInt(3, 8);
+                    itemSize[0] = rand.nextInt(3, 8);
+                    itemSize[1] = rand.nextInt(3, 8);
+                    itemSize[2] = rand.nextInt(3, 8);
                 }
                 case PersonalAccessories -> {
-                    size[0] = rand.nextInt(1, 3);
-                    size[1] = rand.nextInt(1, 3);
-                    size[2] = rand.nextInt(1, 3);
+                    itemSize[0] = rand.nextInt(1, 3);
+                    itemSize[1] = rand.nextInt(1, 3);
+                    itemSize[2] = rand.nextInt(1, 3);
                 }
                 case Tools -> {
-                    size[0] = rand.nextInt(2, 4);
-                    size[1] = rand.nextInt(2, 4);
-                    size[2] = rand.nextInt(2, 4);
+                    itemSize[0] = rand.nextInt(2, 4);
+                    itemSize[1] = rand.nextInt(2, 4);
+                    itemSize[2] = rand.nextInt(2, 4);
                 }
             }
 
@@ -71,7 +69,7 @@ public class RandomItemsGenerator implements Generator<Items> {
                             item,
                             category,
                             color,
-                            size,
+                            itemSize,
                             rand.nextInt(1, 300),
                             price,
                             methods[rand.nextInt(methods.length)]

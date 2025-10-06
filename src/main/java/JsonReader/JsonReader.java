@@ -8,7 +8,7 @@ public class JsonReader {
     public static Map<String, List<String>> readItems() {
         Map<String, List<String>> map = new LinkedHashMap<>();
 
-        try (BufferedReader reader = new BufferedReader(new FileReader("src/Files/items.json"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("src/main/java/Files/items.json"))) {
             String line;
             String category;
             while ((line = reader.readLine()) != null) {
@@ -38,7 +38,7 @@ public class JsonReader {
     public static Map<String, Map<String, List<String>>> readNames() {
         Map<String, Map<String, List<String>>> result = new LinkedHashMap<>();
 
-        try (BufferedReader reader = new BufferedReader(new FileReader("src/Files/names.json"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("src/main/java/Files/names.json"))) {
             String line;
             String currentGender = null;
 

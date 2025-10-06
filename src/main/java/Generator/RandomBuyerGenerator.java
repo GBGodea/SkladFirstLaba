@@ -4,22 +4,27 @@ import Entities.Buyer;
 import Entities.HelperClasses.Passport;
 import Entities.HelperClasses.Person;
 import Entities.Items;
-import Generator.utils.FileReaderClass;
 import JsonReader.JsonReader;
 
 import java.time.LocalDateTime;
 import java.util.*;
 
 public class RandomBuyerGenerator implements Generator<Buyer> {
+
+    List<Items> items;
+
+    public RandomBuyerGenerator(List<Items> items) {
+        this.items = items;
+    }
+
     @Override
-    public List<Buyer> generator() {
+    public List<Buyer> generator(int size) {
         Random rand = new Random();
         List<Buyer> buyerList = new ArrayList<>();
         Map<String, Map<String, List<String>>> namesMap = JsonReader.readNames();
-        List<Items> items = new RandomItemsGenerator().generator();
 
         if (!items.isEmpty()) {
-            int count = rand.nextInt(100,100_000);
+            int count = rand.nextInt(size);
             for (int i = 0; i < count; i++) {
                 String gender = rand.nextBoolean() ? "male" : "female";
                 Map<String, List<String>> genderMap = namesMap.get(gender);

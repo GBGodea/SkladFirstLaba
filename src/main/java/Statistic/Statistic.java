@@ -9,15 +9,16 @@ import Entities.HelperClasses.JobPosition;
 import Entities.HelperClasses.Person;
 import Entities.Items;
 import Statistic.utils.Pair;
+import Spliterator.BuyerSpliterator;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 public class Statistic {
-    //TODO данные list нужно именно заполнить здесь один раз для экономии памяти и Runtime
     List<Buyer> buyers;
     List<Employee> employees;
     List<Triplet<Integer, String, String>> persons;
@@ -90,16 +91,21 @@ public class Statistic {
         return mostFrequentEmployeeName();
     }
 
+    // Добавлена логика Параллельных стримов
     private Pair<String, Integer> mostFrequentBuyerName() {
-        Map<String, Long> map = buyers.stream()
-                .collect(Collectors.groupingBy(buyer -> buyer.person().getName(), Collectors.counting()));
+        ConcurrentHashMap<String, Long> map = buyers.parallelStream()
+                .collect(Collectors.groupingBy(
+                        buyer -> buyer.person().getName(),
+                        ConcurrentHashMap::new,
+                        Collectors.counting()
+                ));
 
-        long max = map.entrySet().stream()
+        long max = map.entrySet().parallelStream()
                 .max(Map.Entry.comparingByValue())
                 .map(Map.Entry::getValue)
                 .orElse(0L);
 
-        Optional<String> result = map.entrySet().stream()
+        Optional<String> result = map.entrySet().parallelStream()
                 .filter(e -> e.getValue().equals(max))
                 .map(Map.Entry::getKey)
                 .findFirst();
@@ -182,9 +188,10 @@ public class Statistic {
     }
 
     // Анализ ценности покупателей(Высчитывает суммарную покупательскую способность пользователя по корзине с товарами)
+    // Добавлена логика Параллельных Стримов
     private Map<UUID, BigDecimal> valueAnalysis() {
-        return buyers.stream()
-                .collect(Collectors.toMap(
+        return buyers.parallelStream()
+                .collect(Collectors.toConcurrentMap(
                         b -> b.person().getId(),
                         b -> b.basket().stream()
                                 .map(item -> item.price().multiply(BigDecimal.valueOf(item.count())))
@@ -192,7 +199,7 @@ public class Statistic {
                         BigDecimal::add
                 ))
                 .entrySet()
-                .stream()
+                .parallelStream()
                 .sorted(Map.Entry.<UUID, BigDecimal>comparingByValue().reversed())
                 .limit(3)
                 .collect(Collectors.toMap(
@@ -210,14 +217,18 @@ public class Statistic {
     }
 
     // Топ людей по разнообразию покупок
+    // Добавлен собственный Spliterator для обработки данных
     private List<Pair<UUID, Integer>> topByCategoryDiversity() {
-        Map<UUID, Set<Category>> diversity = buyers.stream()
-                .collect(Collectors.toMap(
+        ConcurrentMap<UUID, Set<Category>> diversity = StreamSupport.stream(new BuyerSpliterator(buyers), true)
+                .collect(Collectors.toConcurrentMap(
                         b -> b.person().getId(),
-                        b -> b.basket().stream()
+                        b -> b.basket().parallelStream()
                                 .map(Items::category)
                                 .collect(Collectors.toSet()),
-                        (s1, s2) -> { s1.addAll(s2); return s1; }
+                        (s1, s2) -> {
+                            s1.addAll(s2);
+                            return s1;
+                        }
                 ));
 
         List<Pair<UUID, Integer>> list = diversity.entrySet().stream()
@@ -231,7 +242,7 @@ public class Statistic {
 
     public List<Pair<UUID, Integer>> topByCategoryDiversity(long delay) throws InterruptedException {
         Thread.sleep(delay);
-        return  topByCategoryDiversity();
+        return topByCategoryDiversity();
     }
 
     // Топ работников по соотношению возраста к зарплате
@@ -255,8 +266,9 @@ public class Statistic {
     }
 
     // Вычисление статической дисперсии цен всех товаров в корзине
+    // Добавлен собственный Spliterator
     private List<Pair<UUID, Double>> topByPriceVariance() {
-        return buyers.stream()
+        return StreamSupport.stream(new BuyerSpliterator(buyers), true)
                 .map(b -> {
                     List<Double> prices = b.basket().stream()
                             .flatMap(item ->
