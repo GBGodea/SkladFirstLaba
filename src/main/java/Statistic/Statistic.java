@@ -34,7 +34,7 @@ public class Statistic {
     }
 
     // Среднее по возрасту
-    public int averageEmployeeAge() {
+    private int averageEmployeeAge() {
         int sum = 0;
         for (int i = 0; i < employees.size(); i++) {
             sum += employees.get(i).person().getAge();
@@ -42,16 +42,31 @@ public class Statistic {
         return sum / employees.size();
     }
 
-    public int averageBuyerAge() {
+    public int averageEmployeeAge(long delay) throws InterruptedException {
+        Thread.sleep(delay);
+        return averageEmployeeAge();
+    }
+
+    private int averageBuyerAge() {
         return (int) buyers.stream().mapToInt(buyers -> buyers.person().getAge()).average().orElse(0);
     }
 
-    public int averagePersonAge() {
+    public int averageBuyerAge(long delay) throws InterruptedException {
+        Thread.sleep(delay);
+        return averageBuyerAge();
+    }
+
+    private int averagePersonAge() {
         return (int) persons.stream().mapToInt(Triplet::getAge).average().orElse(0);
     }
 
+    public int averagePersonAge(long delay) throws InterruptedException {
+        Thread.sleep(delay);
+        return averagePersonAge();
+    }
+
     // Самое часто встречаемое имя
-    public Pair<String, Integer> mostFrequentEmployeeName() {
+    private Pair<String, Integer> mostFrequentEmployeeName() {
         Map<String, Integer> map = new HashMap<>();
 
         Pair<String, Integer> frequent = new Pair<>("", 0);
@@ -70,7 +85,12 @@ public class Statistic {
         return frequent;
     }
 
-    public Pair<String, Integer> mostFrequentBuyerName() {
+    public Pair<String, Integer> mostFrequentEmployeeName(long delay) throws InterruptedException {
+        Thread.sleep(delay);
+        return mostFrequentEmployeeName();
+    }
+
+    private Pair<String, Integer> mostFrequentBuyerName() {
         Map<String, Long> map = buyers.stream()
                 .collect(Collectors.groupingBy(buyer -> buyer.person().getName(), Collectors.counting()));
 
@@ -87,7 +107,12 @@ public class Statistic {
         return result.map(name -> new Pair<>(name, (int) max)).orElse(null);
     }
 
-    public Pair<String, Integer> mostFrequentPersonName() {
+    public Pair<String, Integer> mostFrequentBuyerName(long delay) throws InterruptedException {
+        Thread.sleep(delay);
+        return mostFrequentBuyerName();
+    }
+
+    private Pair<String, Integer> mostFrequentPersonName() {
         Map<String, Long> map = persons.stream()
                 .collect(Collectors.groupingBy(Triplet::getName, Collectors.counting()));
 
@@ -103,9 +128,14 @@ public class Statistic {
         return result.map(name -> new Pair<>(name, (int) max)).orElse(null);
     }
 
+    public Pair<String, Integer> mostFrequentPersonName(long delay) throws InterruptedException {
+        Thread.sleep(delay);
+        return mostFrequentPersonName();
+    }
+
 
     // Самая часто встречаемая профессия
-    public Pair<String, Integer> mostFrequentJobPosition() {
+    private Pair<String, Integer> mostFrequentJobPosition() {
         Map<JobPosition, Long> map = employees.stream().collect(Collectors.groupingBy(Employee::jobPosition, Collectors.counting()));
 
         long max = map.entrySet().stream().max(Map.Entry.comparingByValue())
@@ -117,8 +147,13 @@ public class Statistic {
         return result.map(jobPosition -> new Pair<>(jobPosition.name(), (int) max)).orElse(null);
     }
 
+    public Pair<String, Integer> mostFrequentJobPosition(long delay) throws InterruptedException {
+        Thread.sleep(delay);
+        return mostFrequentJobPosition();
+    }
+
     // Категория наиболее часто выбираемого товара в корзине
-    public Pair<String, Integer> mostFrequentItemInPersonBusket() {
+    private Pair<String, Integer> mostFrequentItemInPersonBusket() {
         return buyers.stream().flatMap(buyer -> buyer.basket().stream())
                 .collect(Collectors.groupingBy(item -> item.category().toString(),
                         Collectors.reducing(0, e -> 1, Integer::sum)))
@@ -128,16 +163,26 @@ public class Statistic {
                 .orElse(null);
     }
 
+    public Pair<String, Integer> mostFrequentItemInPersonBusket(long delay) throws InterruptedException {
+        Thread.sleep(delay);
+        return mostFrequentItemInPersonBusket();
+    }
+
     // Самое большое количество товара на складе
-    public Pair<String, Integer> biggestCountOfItem() {
+    private Pair<String, Integer> biggestCountOfItem() {
         return items.stream()
                 .max(Comparator.comparingInt(Items::count))
                 .map(item -> new Pair<>(item.name(), item.count()))
                 .orElse(null);
     }
 
+    public Pair<String, Integer> biggestCountOfItem(long delay) throws InterruptedException {
+        Thread.sleep(delay);
+        return biggestCountOfItem();
+    }
+
     // Анализ ценности покупателей(Высчитывает суммарную покупательскую способность пользователя по корзине с товарами)
-    public Map<UUID, BigDecimal> valueAnalysis() {
+    private Map<UUID, BigDecimal> valueAnalysis() {
         return buyers.stream()
                 .collect(Collectors.toMap(
                         b -> b.person().getId(),
@@ -159,8 +204,13 @@ public class Statistic {
                 );
     }
 
+    public Map<UUID, BigDecimal> valueAnalysis(long delay) throws InterruptedException {
+        Thread.sleep(delay);
+        return valueAnalysis();
+    }
+
     // Топ людей по разнообразию покупок
-    public List<Pair<UUID, Integer>> topByCategoryDiversity() {
+    private List<Pair<UUID, Integer>> topByCategoryDiversity() {
         Map<UUID, Set<Category>> diversity = buyers.stream()
                 .collect(Collectors.toMap(
                         b -> b.person().getId(),
@@ -179,8 +229,14 @@ public class Statistic {
                 .collect(Collectors.toList());
     }
 
+    public List<Pair<UUID, Integer>> topByCategoryDiversity(long delay) throws InterruptedException {
+        Thread.sleep(delay);
+        return  topByCategoryDiversity();
+    }
+
     // Топ работников по соотношению возраста к зарплате
-    public List<Pair<UUID, Double>> topByAgeSalaryRatio() {
+    // Метод с задержкой
+    private List<Pair<UUID, Double>> topByAgeSalaryRatio() {
         return employees.stream()
                 .map(e -> {
                     double age = e.person().getAge();
@@ -193,8 +249,13 @@ public class Statistic {
                 .collect(Collectors.toList());
     }
 
+    public List<Pair<UUID, Double>> topByAgeSalaryRatio(long delay) throws InterruptedException {
+        Thread.sleep(delay);
+        return topByAgeSalaryRatio();
+    }
+
     // Вычисление статической дисперсии цен всех товаров в корзине
-    public List<Pair<UUID, Double>> topByPriceVariance() {
+    private List<Pair<UUID, Double>> topByPriceVariance() {
         return buyers.stream()
                 .map(b -> {
                     List<Double> prices = b.basket().stream()
@@ -217,5 +278,10 @@ public class Statistic {
                 .sorted(Comparator.comparing(Pair<UUID, Double>::value).reversed())
                 .limit(10)
                 .collect(Collectors.toList());
+    }
+
+    public List<Pair<UUID, Double>> topByPriceVariance(long delay) throws InterruptedException {
+        Thread.sleep(delay);
+        return topByPriceVariance();
     }
 }
