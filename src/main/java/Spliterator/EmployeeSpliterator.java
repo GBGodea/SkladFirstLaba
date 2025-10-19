@@ -10,7 +10,7 @@ public class EmployeeSpliterator implements Spliterator<Employee> {
     private final List<Employee> list;
     private int current;
     private final int end;
-    private static final int THRESHOLD = 10_000;
+    private static final int THRESHOLD = 1000;
 
     public EmployeeSpliterator(List<Employee> list) {
         this(list, 0, list.size());

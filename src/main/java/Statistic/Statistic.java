@@ -191,7 +191,7 @@ public class Statistic {
     // Добавлена логика Параллельных Стримов
     private Map<UUID, BigDecimal> valueAnalysis() {
         return buyers.parallelStream()
-                .collect(Collectors.toConcurrentMap(
+                .collect(Collectors.toMap(
                         b -> b.person().getId(),
                         b -> b.basket().stream()
                                 .map(item -> item.price().multiply(BigDecimal.valueOf(item.count())))
@@ -199,16 +199,15 @@ public class Statistic {
                         BigDecimal::add
                 ))
                 .entrySet()
-                .parallelStream()
+                .stream()
                 .sorted(Map.Entry.<UUID, BigDecimal>comparingByValue().reversed())
                 .limit(3)
                 .collect(Collectors.toMap(
-                                Map.Entry::getKey,
-                                Map.Entry::getValue,
-                                (e1, e2) -> e1,
-                                LinkedHashMap::new
-                        )
-                );
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (e1, e2) -> e1,
+                        LinkedHashMap::new
+                ));
     }
 
     public Map<UUID, BigDecimal> valueAnalysis(long delay) throws InterruptedException {

@@ -10,7 +10,7 @@ public class BuyerSpliterator implements Spliterator<Buyer> {
     private final List<Buyer> list;
     private int current;
     private final int end;
-    private static final int THRESHOLD = 10_000;
+    private static final int THRESHOLD = 1000;
 
     public BuyerSpliterator(List<Buyer> list) {
         this(list, 0, list.size());
