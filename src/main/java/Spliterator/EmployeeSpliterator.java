@@ -10,7 +10,7 @@ public class EmployeeSpliterator implements Spliterator<Employee> {
     private final List<Employee> list;
     private int current;
     private final int end;
-    private static final int THRESHOLD = 10_000;
+    private static final int THRESHOLD = 100;
 
     public EmployeeSpliterator(List<Employee> list) {
         this(list, 0, list.size());
@@ -23,7 +23,6 @@ public class EmployeeSpliterator implements Spliterator<Employee> {
     }
 
     @Override
-
     public boolean tryAdvance(Consumer<? super Employee> action) {
         if(current < end) {
             action.accept(list.get(current++));
@@ -45,12 +44,20 @@ public class EmployeeSpliterator implements Spliterator<Employee> {
     }
 
     @Override
+    public void forEachRemaining(Consumer<? super  Employee> action) {
+        for(int i = current; i < end; i++) {
+            action.accept(list.get(i));
+        }
+        current = end;
+    }
+
+    @Override
     public long estimateSize() {
         return end - current;
     }
 
     @Override
     public int characteristics() {
-        return ORDERED | SIZED | SUBSIZED | IMMUTABLE;
+        return ORDERED | SIZED | SUBSIZED;
     }
 }

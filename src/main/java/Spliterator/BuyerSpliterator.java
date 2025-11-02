@@ -1,6 +1,7 @@
 package Spliterator;
 
 import Entities.Buyer;
+import Entities.Employee;
 
 import java.util.List;
 import java.util.Spliterator;
@@ -10,7 +11,7 @@ public class BuyerSpliterator implements Spliterator<Buyer> {
     private final List<Buyer> list;
     private int current;
     private final int end;
-    private static final int THRESHOLD = 10_000;
+    private static final int THRESHOLD = 100;
 
     public BuyerSpliterator(List<Buyer> list) {
         this(list, 0, list.size());
@@ -45,12 +46,20 @@ public class BuyerSpliterator implements Spliterator<Buyer> {
     }
 
     @Override
+    public void forEachRemaining(Consumer<? super Buyer> action) {
+        for(int i = current; i < end; i++) {
+            action.accept(list.get(i));
+        }
+        current = end;
+    }
+
+    @Override
     public long estimateSize() {
         return end - current;
     }
 
     @Override
     public int characteristics() {
-        return ORDERED | SIZED | SUBSIZED | IMMUTABLE;
+        return ORDERED | SIZED | SUBSIZED;
     }
 }

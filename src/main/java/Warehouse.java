@@ -45,34 +45,34 @@ public class Warehouse {
         Statistic statistics = new Statistic(buyer, employees, persons, items);
 
         writer.write("Average buyer age: ");
-        writer.write(statistics.averageBuyerAge(0) + "\n\n");
+        writer.write(statistics.getAverageBuyerAge(0) + "\n\n");
 
         writer.write("Average employee age: ");
-        writer.write(statistics.averageEmployeeAge(0) + "\n\n");
+        writer.write(statistics.getAverageEmployeeAge(0) + "\n\n");
 
         writer.write("Average person age: ");
-        writer.write(statistics.averagePersonAge(0) + "\n\n");
+        writer.write(statistics.getAveragePersonAge(0) + "\n\n");
 
         writer.write("Top buy price variance:\n");
-        writer.write(statistics.topByPriceVariance(0) + "\n\n");
+        writer.write(statistics.getTopBuyersByPriceVariance(0) + "\n\n");
 
         writer.write("Biggest count of item:\n");
-        writer.write(statistics.biggestCountOfItem(0) + "\n\n");
+        writer.write(statistics.getMaxItemCountInWarehouse(0) + "\n\n");
 
         writer.write("Most frequent buyer name:\n");
-        writer.write(statistics.mostFrequentBuyerName(0) + "\n\n");
+        writer.write(statistics.getMostFrequentBuyerName(0) + "\n\n");
 
         writer.write("Most frequent employee name:\n");
-        writer.write(statistics.mostFrequentEmployeeName(0) + "\n\n");
+        writer.write(statistics.getMostFrequentEmployeeName(0) + "\n\n");
 
         writer.write("Most frequent person name:\n");
-        writer.write(statistics.mostFrequentPersonName(0) + "\n\n");
+        writer.write(statistics.getMostFrequentPersonName(0) + "\n\n");
 
         writer.write("Most frequent item in person basket:\n");
-        writer.write(statistics.mostFrequentItemInPersonBusket(0) + "\n\n");
+        writer.write(statistics.getMostFrequentItemCategoryInBuyers(0) + "\n\n");
 
         writer.write("Most frequent job position:\n");
-        writer.write(statistics.mostFrequentJobPosition(0) + "\n\n");
+        writer.write(statistics.getMostFrequentJobPosition(0) + "\n\n");
 
 //        System.out.println("\nIteration:");
 //        start = Instant.now();
