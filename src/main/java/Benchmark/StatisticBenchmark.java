@@ -7,6 +7,7 @@ import Entities.Items;
 import Generator.RandomBuyerGenerator;
 import Generator.RandomEmployeeGenerator;
 import Generator.RandomItemsGenerator;
+import Statistic.ReactiveStatistic;
 import Statistic.Statistic;
 import Statistic.utils.Pair;
 import org.openjdk.jmh.annotations.*;
@@ -30,12 +31,13 @@ public class StatisticBenchmark {
     private List<Person> persons;
     private List<Items> items;
     private Statistic statistic;
+    private ReactiveStatistic reactiveStatistic;
 
     // Засыпание треда можно убрать, чтобы benchmark был быстрее
-    @Param({"0", "5", "10", "20"})
+    @Param({ "0", "5", "10", "20" })
     private long delay;
 
-    @Param({"1000", "10000", "100000", "1000000"})
+    @Param({ "1000", "10000", "100000", "1000000" })
     private int size;
 
     @Setup(Level.Trial)
@@ -46,6 +48,7 @@ public class StatisticBenchmark {
         persons = Stream.concat(buyers.stream().map(Buyer::person), employees.stream().map(Employee::person))
                 .collect(Collectors.toCollection(ArrayList::new));
         statistic = new Statistic(buyers, employees, persons, items);
+        reactiveStatistic = new ReactiveStatistic(buyers);
     }
 
     @Benchmark
