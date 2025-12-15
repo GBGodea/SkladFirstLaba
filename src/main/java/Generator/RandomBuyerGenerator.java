@@ -18,13 +18,13 @@ public class RandomBuyerGenerator implements Generator<Buyer> {
     }
 
     @Override
-    public List<Buyer> generator(int size) {
+    public List<Buyer> generator(int from, int size) {
         Random rand = new Random();
         List<Buyer> buyerList = new ArrayList<>();
         Map<String, Map<String, List<String>>> namesMap = JsonReader.readNames();
 
         if (!items.isEmpty()) {
-            int count = rand.nextInt(size);
+            int count = rand.nextInt(from, size);
             for (int i = 0; i < count; i++) {
                 String gender = rand.nextBoolean() ? "male" : "female";
                 Map<String, List<String>> genderMap = namesMap.get(gender);

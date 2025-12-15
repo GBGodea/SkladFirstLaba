@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Warehouse.iml" filepath="$PROJECT_DIR$/Warehouse.iml" />
+      <module fileurl="file://$PROJECT_DIR$/parallel-streams-lab.iml" filepath="$PROJECT_DIR$/parallel-streams-lab.iml" />
     </modules>
   </component>
 </project>

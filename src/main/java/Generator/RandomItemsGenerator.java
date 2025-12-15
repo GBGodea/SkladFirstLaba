@@ -11,7 +11,7 @@ import java.util.*;
 
 public class RandomItemsGenerator implements Generator<Items> {
     @Override
-    public List<Items> generator(int size) {
+    public List<Items> generator(int from, int size) {
         Random rand = new Random();
         List<Items> itemsList = new ArrayList<>();
         Map<String, List<String>> parsedJson = JsonReader.readItems();
@@ -19,7 +19,7 @@ public class RandomItemsGenerator implements Generator<Items> {
         Colors[] colors = Colors.values();
         ShippingMethod[] methods = ShippingMethod.values();
 
-        for (int i = 0; i < rand.nextInt(size); i++) {
+        for (int i = 0; i < rand.nextInt(from, size); i++) {
             Category category = Category.valueOf(categories[rand.nextInt(categories.length)].replaceAll(" ", ""));
             List<String> takedItems = parsedJson.get(category.toString());
             String item = takedItems.get(rand.nextInt(takedItems.size()));
