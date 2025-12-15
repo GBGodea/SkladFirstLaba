@@ -29,6 +29,7 @@ import java.util.stream.Stream;
 @Warmup(iterations = 1, time = 1, timeUnit = TimeUnit.SECONDS)
 @Measurement(iterations = 1, time = 1, timeUnit = TimeUnit.SECONDS)
 @Fork(value = 1)
+@Threads(3)
 public class StatisticBenchmark {
     private List<Buyer> buyers;
     private List<Employee> employees;
@@ -42,7 +43,7 @@ public class StatisticBenchmark {
     @Param({"0", "5", "10"})
     private long delay;
 
-    @Param({"5000", "10000", "100000"})
+    @Param({"5000", "10000", "50000"})
     private int size;
 
     @Setup(Level.Trial)

@@ -21,6 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Warmup(iterations = 1, time = 1, timeUnit = TimeUnit.SECONDS)
 @Measurement(iterations = 1, time = 1, timeUnit = TimeUnit.SECONDS)
 @Fork(value = 1)
+@Threads(3)
 public class BackpressureBenchmark {
 
     private List<Buyer> buyers;

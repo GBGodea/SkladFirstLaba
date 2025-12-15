@@ -1,111 +1,123 @@
 package Statistic;
 
-import io.reactivex.rxjava3.core.Flowable;
-import io.reactivex.rxjava3.schedulers.Schedulers;
-import io.reactivex.rxjava3.subscribers.ResourceSubscriber;
 import Entities.Buyer;
+import Entities.Employee;
 import Entities.Items;
+import Statistic.utils.CustomAdaptiveSubscriber;
 import Statistic.utils.Pair;
+import io.reactivex.rxjava3.core.Flowable;
+import io.reactivex.rxjava3.core.Scheduler;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
-public class AdvancedReactiveStatistic {
-    private final List<Buyer> buyers;
 
-    public AdvancedReactiveStatistic(List<Buyer> buyers) {
+public class AdvancedReactiveStatistic {
+    private final List<Employee> employees;
+    private final List<Buyer> buyers;
+    private final Scheduler scheduler;
+
+    public AdvancedReactiveStatistic(List<Employee> employees, List<Buyer> buyers) {
+        this.employees = employees;
         this.buyers = buyers;
+        this.scheduler = Schedulers.computation();
     }
 
-    public List<Pair<UUID, Integer>> getTopBuyersByCategoryDiversityWithBackpressure(long delay)
+    public Pair<String, Integer> getMostFrequentJobPositionWithSubscriber(long delay)
             throws InterruptedException {
 
         CountDownLatch latch = new CountDownLatch(1);
-        CategoryDiversitySubscriber subscriber = new CategoryDiversitySubscriber(latch);
+        AtomicReference<Pair<String, Integer>> result = new AtomicReference<>();
+        AtomicReference<Throwable> error = new AtomicReference<>();
 
-        Flowable<List<Buyer>> flowable = Flowable.just(buyers);
+        CustomAdaptiveSubscriber<Pair<String, Integer>, Pair<String, Integer>> subscriber =
+                new CustomAdaptiveSubscriber<>(
+                        16,
+                        10,
+                        pair -> pair,
+                        pair -> result.set(pair)
+                );
 
-        if (delay > 0) {
-            flowable = flowable.delay(delay, TimeUnit.MILLISECONDS, Schedulers.io());
-        }
-
-        flowable
-                .flatMap(Flowable::fromIterable)
-                .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.computation(), false, 100)
+        Flowable.fromIterable(employees)
+                .groupBy(Employee::jobPosition)
+                .flatMapSingle(group -> group
+                        .count()
+                        .map(count -> new Pair<>(group.getKey().name(), count.intValue()))
+                )
+                .reduce((pair1, pair2) ->
+                        pair1.value() >= pair2.value() ? pair1 : pair2
+                )
+                .delay(delay, TimeUnit.MILLISECONDS, scheduler)
+                .toFlowable()
+                .doOnError(err -> error.set(err))
+                .doOnComplete(latch::countDown)
                 .subscribe(subscriber);
 
-        latch.await(30, TimeUnit.SECONDS);
-        return subscriber.getTopBuyers();
+        if (!latch.await(30, TimeUnit.SECONDS)) {
+            throw new RuntimeException("Timeout: AdvancedStatistic getMostFrequentJobPosition");
+        }
+
+        if (error.get() != null) {
+            throw new RuntimeException("Error: " + error.get());
+        }
+
+        return result.get();
     }
 
-    private static class CategoryDiversitySubscriber extends ResourceSubscriber<Buyer> {
-        private final ConcurrentHashMap<UUID, Set<String>> buyerCategories;
-        private final CountDownLatch latch;
-        private final AtomicReference<List<Pair<UUID, Integer>>> topBuyers;
-        private static final int BATCH_SIZE = 50;
+    public List<Pair<UUID, Integer>> getTopBuyersByCategoryDiversityWithSubscriber(long delay)
+            throws InterruptedException {
 
-        public CategoryDiversitySubscriber(CountDownLatch latch) {
-            this.latch = latch;
-            this.buyerCategories = new ConcurrentHashMap<>();
-            this.topBuyers = new AtomicReference<>(Collections.emptyList());
+        CountDownLatch latch = new CountDownLatch(1);
+        AtomicReference<List<Pair<UUID, Integer>>> result = new AtomicReference<>(new ArrayList<>());
+        AtomicReference<Throwable> error = new AtomicReference<>();
+
+        CustomAdaptiveSubscriber<Pair<UUID, Integer>, Pair<UUID, Integer>> subscriber =
+                new CustomAdaptiveSubscriber<>(
+                        32,
+                        15,
+                        pair -> pair,
+                        pair -> result.get().add(pair)
+                );
+
+        Flowable.fromCallable(() -> buyers.parallelStream()
+                        .collect(Collectors.toConcurrentMap(
+                                buyer -> buyer.person().getId(),
+                                buyer -> buyer.basket().stream()
+                                        .map(Items::category)
+                                        .collect(Collectors.toSet()),
+                                (set1, set2) -> {
+                                    set1.addAll(set2);
+                                    return set1;
+                                }))
+                        .entrySet()
+                        .stream()
+                        .map(entry -> new Pair<>(entry.getKey(), entry.getValue().size()))
+                        .sorted(Comparator.comparing(Pair<UUID, Integer>::value).reversed())
+                        .limit(10)
+                        .collect(Collectors.toList()))
+                .subscribeOn(scheduler)
+                .delay(delay, TimeUnit.MILLISECONDS, scheduler)
+                .observeOn(Schedulers.single())
+                .flatMap(Flowable::fromIterable)
+                .doOnError(err -> error.set(err))
+                .doOnComplete(latch::countDown)
+                .subscribe(subscriber);
+
+        if (!latch.await(30, TimeUnit.SECONDS)) {
+            throw new RuntimeException("Timeout: AdvancedStatistic getTopBuyersByCategoryDiversity");
         }
 
-        @Override
-        protected void onStart() {
-            request(BATCH_SIZE);
+        if (error.get() != null) {
+            throw new RuntimeException("Error: " + error.get());
         }
 
-        @Override
-        public void onNext(Buyer buyer) {
-            try {
-                UUID buyerId = buyer.person().getId();
-                Set<String> categories = buyer.basket().stream()
-                        .map(item -> item.category().toString())
-                        .collect(Collectors.toSet());
-                buyerCategories.merge(buyerId, categories, (existingSet, newSet) -> {
-                    existingSet.addAll(newSet);
-                    return existingSet;
-                });
-
-                request(1);
-
-            } catch (Exception e) {
-                onError(e);
-            }
-        }
-
-        @Override
-        public void onError(Throwable t) {
-            System.err.println("Error processing buyers: " + t.getMessage());
-            processFinalResults();
-            latch.countDown();
-        }
-
-        @Override
-        public void onComplete() {
-            System.out.println("Completed processing all buyers");
-            processFinalResults();
-            latch.countDown();
-        }
-
-        private void processFinalResults() {
-            List<Pair<UUID, Integer>> results = buyerCategories.entrySet()
-                    .stream()
-                    .map(entry -> new Pair<>(entry.getKey(), entry.getValue().size()))
-                    .sorted(Comparator.comparing(Pair<UUID, Integer>::value).reversed())
-                    .limit(10)
-                    .collect(Collectors.toList());
-
-            topBuyers.set(results);
-        }
-
-        public List<Pair<UUID, Integer>> getTopBuyers() {
-            return topBuyers.get();
-        }
+        return result.get();
     }
 }

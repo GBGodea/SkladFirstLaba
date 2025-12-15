@@ -13,6 +13,8 @@ import Entities.Items;
 import Generator.RandomBuyerGenerator;
 import Generator.RandomEmployeeGenerator;
 import Generator.RandomItemsGenerator;
+import Statistic.AdvancedReactiveStatistic;
+import Statistic.Statistic;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -141,6 +143,12 @@ public class Warehouse {
 //                        error -> System.err.println("Ошибка: " + error),       // onError
 //                        () -> System.out.println("Завершено")                  // onComplete
 //                );
+
+        Statistic statistics = new Statistic(buyer, employees, persons, items);
+        writer.write(statistics.getMostFrequentJobPosition(0).key() + "\n\n");
+
+        AdvancedReactiveStatistic advancedReactiveStatistic = new AdvancedReactiveStatistic(employees, buyer);
+        writer.write(advancedReactiveStatistic.getMostFrequentJobPositionWithSubscriber(0).key());
         writer.flush();
         writer.close();
     }
